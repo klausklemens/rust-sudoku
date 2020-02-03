@@ -10,7 +10,7 @@ use piston::input::*;
 use piston::event_loop::*;
 use glutin_window::GlutinWindow;
 use opengl_graphics::{ GlGraphics, OpenGL };
-use opengl_graphics::glyph_cache::GlyphCache;
+use opengl_graphics::GlyphCache;
 use std::path::Path;
 
 mod app;

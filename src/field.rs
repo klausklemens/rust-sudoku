@@ -1,5 +1,6 @@
-use rand;
+//use rand;
 use rand::Rng;
+use rand::seq::SliceRandom;
 
 pub struct Coords {
     pub x: u8,
@@ -182,7 +183,9 @@ impl Field {
         let coords = empty_cell.unwrap();
 
         let mut digits: Vec<u8> = (1..10).collect();
-        rand::thread_rng().shuffle(&mut digits);
+        
+        let mut rng = rand::thread_rng();
+        digits.shuffle(&mut rng);
 
         for &digit in digits.iter() {
             if self.find_conflict(&coords, digit).is_none() { 
