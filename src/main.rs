@@ -9,7 +9,7 @@ use piston::window::WindowSettings;
 use piston::input::*;
 use piston::event_loop::*;
 use glutin_window::GlutinWindow;
-use opengl_graphics::{ GlGraphics, OpenGL };
+use opengl_graphics::{ GlGraphics, OpenGL, TextureSettings };
 use opengl_graphics::GlyphCache;
 use std::path::Path;
 
@@ -25,17 +25,16 @@ fn main() {
         WindowSettings::new("Sudoku",
             [(settings.wind_size.x as u32), (settings.wind_size.y as u32)])
         .exit_on_esc(true)
-        .opengl(opengl)
         .build()
         .unwrap();
     let ref mut gl = GlGraphics::new(opengl);
 
     let font_path = Path::new("assets/Verdana.ttf");
-    let ref mut cache = GlyphCache::new(font_path).unwrap();
+    let ref mut cache = GlyphCache::new(font_path, (), TextureSettings::new()).unwrap();
 
     let mut app = app::App::new(settings);
 
-    let mut events = window.events();
+    let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             app.on_render(&args, gl, cache);

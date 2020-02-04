@@ -106,8 +106,12 @@ impl App {
                             (y as f64) * self.settings.cell_size.y +
                                 self.settings.text_offset.y);
                         let text = graphics::Text::new(self.settings.font_size);
-                        text.draw(&digit.to_string(), cache,
+                        let r = text.draw(&digit.to_string(), cache,
                                   &c.draw_state, transform, g);
+
+                        if let Err(l) = r {
+                            eprintln!("{}", l);
+                        }
                     }
                 }
             }
@@ -139,6 +143,7 @@ impl App {
                 self.on_mouse_click(&button);
             }
             &Button::Controller(_) => {}
+            &Button::Hat(_) => {}
         }
     }
 

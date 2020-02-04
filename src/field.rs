@@ -1,6 +1,5 @@
-//use rand;
-use rand::Rng;
 use rand::seq::SliceRandom;
+use rand::Rng;
 
 pub struct Coords {
     pub x: u8,
@@ -183,7 +182,7 @@ impl Field {
         let coords = empty_cell.unwrap();
 
         let mut digits: Vec<u8> = (1..10).collect();
-        
+
         let mut rng = rand::thread_rng();
         digits.shuffle(&mut rng);
 
