@@ -47,6 +47,7 @@ impl App {
                        self.settings.cell_size.x, self.settings.cell_size.y],
                       c.transform, g);
 
+            // Fixed cells
             for y in 0..9 {
                 for x in 0..9 {
                     let cell = self.field.get_cell(x, y);
@@ -61,6 +62,7 @@ impl App {
                 }
             }
 
+            // Blue highlights
             if let Some(ref cell) = self.selected_cell {
                 if let Some(digit) = self.field.get_cell(cell.x, cell.y).digit {
                     for y in 0..9 {
@@ -81,6 +83,7 @@ impl App {
                 }
             }
 
+            // red highlights for conflicting cells
             if let Some(ref cell) = self.conflicting_cell {
                 rectangle([0.9, 0.8, 0.8, 1.0],
                           [(cell.x as f64) * self.settings.cell_size.x,
@@ -89,6 +92,7 @@ impl App {
                           c.transform, g);
             }
 
+            // green highlights for selected cell
             if let Some(ref cell) = self.selected_cell {
                 rectangle([0.8, 0.9, 0.8, 1.0],
                           [(cell.x as f64) * self.settings.cell_size.x,
@@ -97,6 +101,7 @@ impl App {
                           c.transform, g);
             }
 
+            // numbers
             for y in 0..9 {
                 for x in 0..9 {
                     if let Some(ref digit) = self.field.cells[y][x].digit {
@@ -112,6 +117,7 @@ impl App {
                 }
             }
 
+            // grid
             for n in 1..9 {
                 let mut thick = 2.0;
                 if n % 3 == 0 {
