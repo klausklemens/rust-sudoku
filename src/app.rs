@@ -106,12 +106,8 @@ impl App {
                             (y as f64) * self.settings.cell_size.y +
                                 self.settings.text_offset.y);
                         let text = graphics::Text::new(self.settings.font_size);
-                        let r = text.draw(&digit.to_string(), cache,
-                                  &c.draw_state, transform, g);
-
-                        if let Err(l) = r {
-                            eprintln!("{}", l);
-                        }
+                        text.draw(&digit.to_string(), cache,
+                                  &c.draw_state, transform, g).unwrap();
                     }
                 }
             }
