@@ -25,7 +25,7 @@ impl App {
         App {
             settings: settings,
             mouse_coords: Vec2f{ x: 0.0, y: 0.0 },
-            field: field::Field::new_random(),
+            field: field::Field::new(),
             selected_cell: None,
             conflicting_cell: None
         }

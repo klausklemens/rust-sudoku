@@ -21,17 +21,10 @@ pub struct Field {
 
 impl Field {
     pub fn new() -> Field {
-        let field = Field {
-            cells: [[Cell{ content: FieldContent::Hints([true; 9]), fixed: false }; 9]; 9]
-        };
-        field
-    }
-
-    pub fn new_random() -> Field {
         let mut field = Field {
             cells: [[Cell{ content: FieldContent::Hints([true; 9]), fixed: false }; 9]; 9]
         };
-        //field.fill_random();
+        field.fill_random();
         field
     }
 
