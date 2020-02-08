@@ -4,6 +4,7 @@ use opengl_graphics::GlGraphics;
 use opengl_graphics::GlyphCache;
 
 use field;
+use field::FieldContent;
 use settings;
 
 struct Vec2f {
@@ -24,7 +25,7 @@ impl App {
         App {
             settings: settings,
             mouse_coords: Vec2f{ x: 0.0, y: 0.0 },
-            field: field::Field::new(),
+            field: field::Field::new_random(),
             selected_cell: None,
             conflicting_cell: None
         }
@@ -64,11 +65,11 @@ impl App {
 
             // Blue highlights
             if let Some(ref cell) = self.selected_cell {
-                if let Some(digit) = self.field.get_cell(cell.x, cell.y).digit {
+                if let FieldContent::Digit(digit) = self.field.get_cell(cell.x, cell.y).content {
                     for y in 0..9 {
                         for x in 0..9 {
-                            if let Some(other_digit) =
-                                    self.field.get_cell(x, y).digit {
+                            if let FieldContent::Digit(other_digit) =
+                                    self.field.get_cell(x, y).content {
                                 if other_digit == digit {
                                     rectangle([0.8, 0.8, 0.9, 1.0],
                                         [(x as f64) * self.settings.cell_size.x,
@@ -104,15 +105,33 @@ impl App {
             // numbers
             for y in 0..9 {
                 for x in 0..9 {
-                    if let Some(ref digit) = self.field.cells[y][x].digit {
-                        let transform = c.transform.trans(
-                            (x as f64) * self.settings.cell_size.x +
-                                self.settings.text_offset.x,
-                            (y as f64) * self.settings.cell_size.y +
-                                self.settings.text_offset.y);
-                        let text = graphics::Text::new(self.settings.font_size);
-                        text.draw(&digit.to_string(), cache,
-                                  &c.draw_state, transform, g).unwrap();
+                    match self.field.cells[y as usize][x as usize].content {
+                        FieldContent::Digit(ref digit) => {
+                            let transform = c.transform.trans(
+                                (x as f64) * self.settings.cell_size.x +
+                                    self.settings.text_offset.x,
+                                (y as f64) * self.settings.cell_size.y +
+                                    self.settings.text_offset.y);
+                            let text = graphics::Text::new(self.settings.font_size);
+                            text.draw(&digit.to_string(), cache,
+                                      &c.draw_state, transform, g).unwrap();
+                        },
+                        FieldContent::Hints(hints) => {
+                            for yi in 0..3 {
+                                for xi in 0..3 {
+                                   let digit: u8 = yi * 3 + xi + 1;
+                                    if hints[(digit - 1) as usize] == true {
+                                        let transform = c.transform.trans(
+                                            (x as f64) * self.settings.cell_size.x + (xi as f64 + 0.3) * (self.settings.text_offset.x / 1.0),
+                                            (y as f64) * self.settings.cell_size.y + (yi as f64 + 1.0) * (self.settings.text_offset.y / 2.5)
+                                        );
+                                        let text = graphics::Text::new_color([0.1, 0.1, 0.9, 1.0], 28);
+                                        text.draw(&digit.to_string(), cache, &c.draw_state, transform, g).unwrap();
+                                    }
+                                }
+                            }
+                        },
+                        FieldContent::None => {}
                     }
                 }
             }
@@ -163,8 +182,7 @@ impl App {
                                 self.conflicting_cell = Some(coords);
                             },
                             None => {
-                                self.field.get_cell(cell.x, cell.y).digit =
-                                    Some(digit);
+                                self.field.set_value(cell.x, cell.y, digit);
                                 self.conflicting_cell = None;
                             }
                         }
@@ -174,9 +192,29 @@ impl App {
         }
         if pressed_key == &Key::Backspace {
             if let Some(ref cell) = self.selected_cell {
-                if !self.field.get_cell(cell.x, cell.y).fixed {
-                    self.field.get_cell(cell.x, cell.y).digit = None;
-                    self.conflicting_cell = None;
+
+                let target = self.field.get_cell(cell.x, cell.y);
+                if !target.fixed {
+                    if let FieldContent::Digit(digit) = target.content {
+                        self.field.set_hints(cell.x, cell.y);
+                        self.conflicting_cell = None;
+
+                        for i in 0..9 {
+                            let coords = [
+                                field::Coords{ x: i, y: cell.y },
+                                field::Coords{ x: cell.x, y: i },
+                                field::Coords{ x: (cell.x / 3) * 3 + i % 3, y: (cell.y / 3) * 3 + (i / 3) }
+                            ];
+
+                            for c in &coords {
+                                if !self.field.find_conflict(c, digit).is_some() {
+                                    if let FieldContent::Hints(ref mut hints) = self.field.get_cell_mut(c.x, c.y).content {
+                                        hints[(digit - 1) as usize] = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -16,6 +16,7 @@ use std::path::Path;
 mod app;
 mod field;
 mod settings;
+mod container;
 
 fn main() {
     let settings = settings::Settings::new();
