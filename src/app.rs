@@ -228,6 +228,11 @@ impl App {
             self.conflicting_cell = None;
             self.selected_cell = None;
         }
+        if pressed_key == &Key::C {
+            self.field.clear();
+            self.conflicting_cell = None;
+            self.selected_cell = None;
+        }
         if pressed_key == &Key::Up {
             match self.selected_cell {
                 Some(ref mut cell) => if cell.y > 0 { cell.y -= 1; },
